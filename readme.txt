@@ -13,7 +13,7 @@ Instantly reply to comments from within "Manage Comments" or from email notifica
 
 **Absolute Comments** beautifully integrates within WordPress and does not add any extra page to manage comments. Everything is done via the original page.
 
-The comments is fully translated in the following languages: English, French, German, Dutch, Italian, Chinese Simplified, Roman, Finnish, Hebrew. See "Translation Notes" for more info.
+The comments is fully translated in the following languages: English, French, German, Italian, Chinese Simplified, Roman, Finnish, Hebrew, Brazilian. See the plugin page for more info.
 
 For a more detailed documentation and screenshots of the interface, please visit its official page: [Absolute Comments](http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/ "Absolute Comments")
 
@@ -25,25 +25,3 @@ For a more detailed documentation and screenshots of the interface, please visit
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Head to your regular *Manage Comments* page
 
-== Frequently Asked Questions ==
-
-= Is it compatible with Google / Yahoo Publisher / whatever terms of use ? =
-
-Yes. It does not modify, alter, change or whatever synonym you'd like your Adsense / YPN code.
-
-= Why would I want not to show ads? I want more money! =
-
-It's been proven by various analytic articles that regular readers come to your site for your content, and don't click ads.
-On the other hands, new visitors, or people referred to your site by search engines, are likely to click ads.
-
-== Translation Notes ==
-
-The plugin comes with the following translations, thanks to the very fine following people:
-* French & English: Ozh (plugin author)
-* German:
-* Chinese Simplified:
-* Dutch:
-* Hebrew:
-* Finnish:
-* Roman:
-* Italian:
