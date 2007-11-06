@@ -20,14 +20,17 @@ $cid = intval(attribute_escape($_GET['id']));
 list($comments, $total) = _wp_get_comment_list( false, 0, 5 );
 
 // Find comment which has id $cid
-while( current($comments)->comment_ID != $cid ) {
+while( true ) {
+	$_current = current($comments);
+	$current = $_current->comment_ID;
+	if ($current == $cid) break;
 	if (next($comments) === false) {
 		// We've looped through and didn't find it :
 		$script = "<script type=\"text/javascript\">
 		window.location = '".get_bloginfo('wpurl')."/wp-admin/edit-comments.php';
 		location.replace = '".get_bloginfo('wpurl')."/wp-admin/edit-comments.php';
 		</script>";
-		die("$script <p>Refreshing...</p>");
+		die("$_script <p>Refreshing...</p>");
 	}
 }
 
