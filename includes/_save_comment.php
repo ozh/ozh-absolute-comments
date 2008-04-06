@@ -19,7 +19,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'cqr_ajaxstore') {
 $cqr_replyto = intval(attribute_escape($_POST['comment_ID']));
 $cqr_threaded = intval(attribute_escape($_POST['cqr_threaded']));
 
-
 global $user_ID;
 $comment_content = trim($_POST['content']);
 $comment_post_ID = intval(attribute_escape($_POST['comment_post_ID']));

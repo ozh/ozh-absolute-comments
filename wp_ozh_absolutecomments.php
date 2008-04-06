@@ -2,16 +2,23 @@
 /*
 Plugin Name: Absolute Comments
 Plugin URI: http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/
-Description: Reply instantly to comments, either from the email notification, or the usual Manage page, without loading the post first.
+Description: Reply instantly to comments, either from the email notification, or the usual <a href="edit-comments.php">Comments</a> page, without loading the post first. <strong>For WordPress 2.5+</strong>
 Author: Ozh
 Author URI: http://planetozh.com/
-Version: 1.0
+Version: 2.0
 */
+
+/* Release history:
+ * 1.0 : Initial release
+ * 2.0 : Update for WordPress 2.5 only. Mostly everything reworked.
+ */
 
 /***************************************************************/
 /************** Optional Editing Below *************************/
 
 /* Note: all 'cqr' references mean 'comment quick reply', original name for the plugin */
+
+global $wp_ozh_cqr;
 
 $wp_ozh_cqr['editor_rows'] = 5;
 	// integer: number of lines of the Editor for comment replying
@@ -36,11 +43,6 @@ $wp_ozh_cqr['show_threaded'] = true;
 $wp_ozh_cqr['show_allcomments'] = true;
 	// boolean: Show link to display all comments for a post
 
-$wp_ozh_cqr['allcomments_useWP'] = false;
-	// boolean: Use WordPress' original page to show all comments from a post.
-	// true: use page /wp-admin/edit.php?p=XXX (WordPress original page)
-	// false: use our own custom page, which some might find better (it *is* definitely better:)
-
 $wp_ozh_cqr['mail_promote'] = true;
 	// boolean: Add a promoting link to the plugin in mail footers. Might help new people
 	// find about this great plugin if you usually reply by email to comments !
@@ -56,7 +58,7 @@ function wp_ozh_cqr_request_handler() {
 
 	global $wp_ozh_cqr, $wp_version, $user_identity;
 
-	$wp_ozh_cqr['path'] = dirname(wp_ozh_cqr_basename(__FILE__));
+	$wp_ozh_cqr['path'] = dirname(plugin_basename(__FILE__));
 	
 	// Store a reply ?
 	if (isset($_POST['cqr_action']) && $_POST['cqr_action'] == 'reply') {
@@ -68,6 +70,7 @@ function wp_ozh_cqr_request_handler() {
 	if (
 		strpos($_SERVER['REQUEST_URI'], 'edit-comments.php') !== false
 		or strpos($_SERVER['REQUEST_URI'], 'edit.php') !== false
+		or strpos($_SERVER['REQUEST_URI'], 'edit-pages.php') !== false
 	) {
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('admin-comments');
@@ -84,24 +87,14 @@ function wp_ozh_cqr_request_handler() {
 	$parent_file = 'edit-comments.php';
 	
 	require_once(ABSPATH.'/wp-admin/admin.php');
-	if ($wp_version >= '2.3') {
-		require_once(ABSPATH.'/wp-admin/includes/admin.php');
-	} else {
-		require_once(ABSPATH.'/wp-admin/admin-functions.php') ;
-	}
-	require_once(ABSPATH.'/wp-admin/admin-functions.php');
-	require_once(ABSPATH.'/wp-includes/pluggable.php');
-	require(ABSPATH . '/wp-admin/menu.php');
+	//require_once(ABSPATH.'/wp-admin/includes/admin.php');
+	//require_once(ABSPATH.'/wp-admin/admin-functions.php');
+	//require_once(ABSPATH.'/wp-includes/pluggable.php');
+	//require_once(ABSPATH.'/wp-admin/menu.php');
 	require_once(ABSPATH.'/wp-admin/admin-header.php');
+	/**/
 
 	if (isset($_GET['quick_reply'])) $cqr = attribute_escape($_GET['quick_reply']);
-	
-	// Case: ?quick_reply=view_all&post_id=XXX
-	if ($cqr == 'view_all') {
-		if (isset($_GET['post_id'])) $post_id = intval(attribute_escape($_GET['quick_reply']));
-		wp_ozh_cqr_include('_view_all.php');
-		return true;
-	}
 	
 	// Case: ?quick_reply=XXX
 	if ( ! $comment = get_comment(intval($cqr)) ) {
@@ -111,11 +104,12 @@ function wp_ozh_cqr_request_handler() {
 	
 	$wp_ozh_cqr['comment'] = $comment;
 
-	echo '<div class="wrap"><h2>'.wp_ozh_cqr__('Your Reply').'</h2>';
+	echo '<div class="wrap">
+	<h2>'.wp_ozh_cqr__('Your Reply').'</h2>';
 	wp_ozh_cqr_include('_reply_form.php');
 	echo '</div>';
 
-	echo "<div class='wrap'>\n";
+	echo '<div class="wrap">'."\n";
 	wp_ozh_cqr_include('_view_comment.php');
 	echo "</div>\n\n";
 	
@@ -163,14 +157,6 @@ function wp_ozh_cqr_print_js() {
 }
 
 
-// Built in function plugin_basename() is broken for Win32 installs, as of WP 2.2 -- the following is added to WordPress core in 2.3
-function wp_ozh_cqr_basename($file) {
-	$file = str_replace('\\','/',$file); // sanitize for Win32 installs
-	$file = preg_replace('|/+|','/', $file); // remove any duplicate slash
-	$file = preg_replace('|^.*/wp-content/plugins/|','',$file); // get relative path from plugin dir
-	return $file;
-}
-
 
 function wp_ozh_cqr_include($inc) {
 	global $wp_ozh_cqr;
@@ -180,7 +166,7 @@ function wp_ozh_cqr_include($inc) {
 // All set up, now tell WP what to do
 add_filter('comment_notification_text', 'wp_ozh_cqr_email', 10, 2);
 if (is_admin())
-	add_action('init', 'wp_ozh_cqr_take_over');
+	add_action('admin_init', 'wp_ozh_cqr_take_over');
 
 	
 ?>
