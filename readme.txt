@@ -1,4 +1,4 @@
-=== Absolute Comments ===
+=== Ozh' Absolute Comments ===
 Donate link: http://planetozh.com/exit/donate
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
 Requires at least: 2.5
