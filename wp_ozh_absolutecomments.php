@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Absolute Comments
+Plugin Name: Ozh' Absolute Comments
 Plugin URI: http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/
 Description: Reply instantly to comments, either from the email notification, or the usual <a href="edit-comments.php">Comments</a> page, without loading the post first. <strong>For WordPress 2.5+</strong>
 Author: Ozh
