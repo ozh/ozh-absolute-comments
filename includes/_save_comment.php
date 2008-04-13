@@ -6,6 +6,7 @@ Part of Plugin: Absolute Comments
 if (!defined('ABSPATH')) require_once('../../../../wp-config.php');
 if (!function_exists('wp_ozh_cqr_take_over') or !current_user_can('edit_posts')) die('You cannot do this');
 
+
 if (!@$_POST) exit;
 
 check_admin_referer('ozh-quickreply');
@@ -32,9 +33,11 @@ $comment_author_url = $user->user_url;
 $commentdata = compact('comment_post_ID', 'comment_author', 'comment_author_email', 'comment_author_url', 'comment_content', 'comment_type', 'user_ID');
 
 // Trick: we don't want wp_die() to send any header, so we pretend we do_action 'admin_head'. Enclosed into output buffering to catch any unwanted display it could generate.
+/**/
 ob_start();
 do_action('admin_head');
 ob_end_clean();
+/**/
 
 $comment_id = wp_new_comment( $commentdata );
 
@@ -53,11 +56,9 @@ if ($cqr_doajax) {
 	<post>$comment_post_ID</post>
 </response>
 XML;
-
 } else {
 	$location = get_bloginfo('wpurl').'/wp-admin/edit-comments.php';
 	wp_redirect($location);
-	die();
 }
-
+die('ok');
 ?>

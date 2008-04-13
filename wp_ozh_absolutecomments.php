@@ -5,58 +5,57 @@ Plugin URI: http://planetozh.com/blog/my-projects/absolute-comments-manager-inst
 Description: Reply instantly to comments, either from the email notification, or the usual <a href="edit-comments.php">Comments</a> page, without loading the post first. <strong>For WordPress 2.5+</strong>
 Author: Ozh
 Author URI: http://planetozh.com/
-Version: 2.0
+Version: 2.1
 */
 
 /* Release history:
  * 1.0 : Initial release
  * 2.0 : Update for WordPress 2.5 only. Mostly everything reworked.
+ * 2.1 : Improved error handling & reporting to help identify conflicting plugins
+         Added an external config file to prevent option overwritting on plugin update
  */
 
 /***************************************************************/
-/************** Optional Editing Below *************************/
+/********* Do not edit  anything. Some options  can be *********/
+/********* changed in file my-options.php which should *********/
+/********* reside in  the same directory as this file. *********/
+/***************************************************************/
 
 /* Note: all 'cqr' references mean 'comment quick reply', original name for the plugin */
 
+if (!function_exists('add_filter')) die('You cannot do this');
+
 global $wp_ozh_cqr;
 
-$wp_ozh_cqr['editor_rows'] = 5;
-	// integer: number of lines of the Editor for comment replying
-	// false: leave as WordPress default (editable through Options / Writing page)
+// Load options and/or set default values
+function wp_ozh_cqr_options() {
+	global $wp_ozh_cqr;
+	if (file_exists(dirname(__FILE__).'/my_options.php')) include(dirname(__FILE__).'/my_options.php');
 
-$wp_ozh_cqr['show_icon'] = true;
-	// boolean: show little icon next to "Reply" links
-
-$wp_ozh_cqr['prefill_reply'] = '%%name%% &amp;raquo; ';
-	// string: text (HTML) pattern to prefill comment. Set to empty string to disable this feature.
-	// Uses the following tokens:
-	// %%link%% : comment permalink
-	// %%name%% : commenter's name
-	// Examples :
-	//  	'%%name%% &amp;raquo; ' => 'Joe &raquo; '
-	//		'@<a href="%%link%%">%%name%%</a>: ' => '@<a href="#comment-1234">Joe</a>: '
-	//		'@%%name%%: ' => '@Joe: '
+	$defaults = array(
+		'editor_rows' => 5,
+		'show_icon' => true,
+		'prefill_reply' => '@%%name%%: ',
+		'show_threaded' => false,
+		'show_allcomments' => true,
+		'mail_promote' => true,
+	);
 	
-$wp_ozh_cqr['show_threaded'] = true;
-	// boolean: Add option to reply in threaded	mode
+	foreach($defaults as $k=>$v) {
+		if (!isset($wp_ozh_cqr[$k]))
+			$wp_ozh_cqr[$k] = $defaults[$k];
+	}
+}
 
-$wp_ozh_cqr['show_allcomments'] = true;
-	// boolean: Show link to display all comments for a post
-
-$wp_ozh_cqr['mail_promote'] = true;
-	// boolean: Add a promoting link to the plugin in mail footers. Might help new people
-	// find about this great plugin if you usually reply by email to comments !
-
-/***************************************************************/
-/***************** Do Not Modify Below *************************/
-
-if (!function_exists('add_filter')) die('You cannot do this');
 
 function wp_ozh_cqr_request_handler() {
 	// Only people who can access the admin area are allowed here, of course
 	if (!current_user_can('edit_posts')) return false;
 
 	global $wp_ozh_cqr, $wp_version, $user_identity;
+
+	// Include personal prefs or load default
+	wp_ozh_cqr_options();
 
 	$wp_ozh_cqr['path'] = dirname(plugin_basename(__FILE__));
 	
@@ -87,12 +86,7 @@ function wp_ozh_cqr_request_handler() {
 	$parent_file = 'edit-comments.php';
 	
 	require_once(ABSPATH.'/wp-admin/admin.php');
-	//require_once(ABSPATH.'/wp-admin/includes/admin.php');
-	//require_once(ABSPATH.'/wp-admin/admin-functions.php');
-	//require_once(ABSPATH.'/wp-includes/pluggable.php');
-	//require_once(ABSPATH.'/wp-admin/menu.php');
 	require_once(ABSPATH.'/wp-admin/admin-header.php');
-	/**/
 
 	if (isset($_GET['quick_reply'])) $cqr = attribute_escape($_GET['quick_reply']);
 	
@@ -157,7 +151,7 @@ function wp_ozh_cqr_print_js() {
 }
 
 
-
+// Include one of our files
 function wp_ozh_cqr_include($inc) {
 	global $wp_ozh_cqr;
 	include(ABSPATH.'/wp-content/plugins/'.$wp_ozh_cqr['path'].'/includes/'.basename($inc));

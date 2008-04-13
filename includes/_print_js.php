@@ -305,24 +305,26 @@ function cqr_store_reply(id) {
 	jQuery.post(
 		'${cqr_blogurl}/wp-content/plugins/${cqr_plugindir}/includes/_save_comment.php',
 		postarray,
-		function (xml) { cqr_get_reply(xml); }
+		function (xml) { cqr_get_reply(xml, id); }
 	);
 	jQuery('#div_quick_reply_'+id).html('<div class="quickreplydivcontent"><p><em>$cqr_postinglink</em></p></div>');
 }
 	
 // Get XML response
-function cqr_get_reply(xml) {
+function cqr_get_reply(xml, id) {
 	if (typeof(xml) == 'string') {
 		// Error mode. We're not supposed to get a String, so it means WP returned an HTML error page
+		var wtf;
 		if (/Duplicate/.test(xml)) {
-			alert ('$cqr_error_duplicate');
+			wtf = '$cqr_error_duplicate';
 		} else if (/too quickly/.test(xml)) {
-			alert ('$cqr_error_toofast');
+			wtf = '$cqr_error_toofast';
 		} else {
-			// Maybe we're not catching the error message because of localization ?
-			alert ('$cqr_error_any');
+			// Anything else, or maybe we're not catching the error message because of localization ?
+			wtf = '$cqr_error_any';
 		}
-		cqr_reset_links();
+		jQuery('#div_quick_reply_'+id).html('<div class="quickreplydivcontent"><p><b>'+wtf+'</b><br/><a href="#" onclick="cqr_reset_links();return false;">Clear</a> <a href="#" id="cqr_error_details">Details &darr;</a></p><div style="display:none" id="cqr_error_message">'+xml+'</div></div>');
+		jQuery('#cqr_error_details').click(function(){jQuery('#cqr_error_message').slideDown();return false;});
 		return;
 	}
 	var replyto = jQuery('replyto',xml).text(); // the id of the comment we replied to
