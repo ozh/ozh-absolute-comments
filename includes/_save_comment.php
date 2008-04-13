@@ -60,5 +60,4 @@ XML;
 	$location = get_bloginfo('wpurl').'/wp-admin/edit-comments.php';
 	wp_redirect($location);
 }
-die('ok');
 ?>
