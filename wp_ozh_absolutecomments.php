@@ -5,7 +5,7 @@ Plugin URI: http://planetozh.com/blog/my-projects/absolute-comments-manager-inst
 Description: Reply instantly to comments, either from the email notification, or the usual <a href="edit-comments.php">Comments</a> page, without loading the post first. <strong>For WordPress 2.5+</strong>
 Author: Ozh
 Author URI: http://planetozh.com/
-Version: 2.1
+Version: 2.2
 */
 
 /* Release history:
@@ -13,13 +13,15 @@ Version: 2.1
  * 2.0 : Update for WordPress 2.5 only. Mostly everything reworked.
  * 2.1 : Improved error handling & reporting to help identify conflicting plugins
          Added an external config file to prevent option overwritting on plugin update
+   2.2 : Improved: adding JS & CSS only on relevant pages
+         Fixed: now correct "View all" links for pages and attachments
+         Added: admin panel to manage options
+		 Removed: external config file.
  */
 
-/***************************************************************/
-/********* Do not edit  anything. Some options  can be *********/
-/********* changed in file my-options.php which should *********/
-/********* reside in  the same directory as this file. *********/
-/***************************************************************/
+/******************************************/
+/********* Do not edit anything. *********/
+/****************************************/
 
 /* Note: all 'cqr' references mean 'comment quick reply', original name for the plugin */
 
@@ -30,21 +32,23 @@ global $wp_ozh_cqr;
 // Load options and/or set default values
 function wp_ozh_cqr_options() {
 	global $wp_ozh_cqr;
-	if (file_exists(dirname(__FILE__).'/my_options.php')) include(dirname(__FILE__).'/my_options.php');
-
+	
+	$wp_ozh_cqr = get_option('ozh_absolutecomments');
+	
 	$defaults = array(
 		'editor_rows' => 5,
 		'show_icon' => true,
 		'prefill_reply' => '@%%name%%: ',
 		'show_threaded' => false,
-		'show_allcomments' => true,
 		'mail_promote' => true,
+		'viewall'=>true,
 	);
 	
 	foreach($defaults as $k=>$v) {
 		if (!isset($wp_ozh_cqr[$k]))
 			$wp_ozh_cqr[$k] = $defaults[$k];
 	}
+	
 }
 
 
@@ -52,7 +56,7 @@ function wp_ozh_cqr_request_handler() {
 	// Only people who can access the admin area are allowed here, of course
 	if (!current_user_can('edit_posts')) return false;
 
-	global $wp_ozh_cqr, $wp_version, $user_identity;
+	global $wp_ozh_cqr, $wp_version, $user_identity, $pagenow;
 
 	// Include personal prefs or load default
 	wp_ozh_cqr_options();
@@ -67,9 +71,9 @@ function wp_ozh_cqr_request_handler() {
 	
 	// Only on 'edit-comments.php' or 'edit.php' we need the cool javascript magic
 	if (
-		strpos($_SERVER['REQUEST_URI'], 'edit-comments.php') !== false
-		or strpos($_SERVER['REQUEST_URI'], 'edit.php') !== false
-		or strpos($_SERVER['REQUEST_URI'], 'edit-pages.php') !== false
+		in_array($pagenow , array('upload.php', 'edit.php', 'edit-comments.php', 'edit-pages.php'))
+		and
+		!is_plugin_page()
 	) {
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('admin-comments');
@@ -110,6 +114,14 @@ function wp_ozh_cqr_request_handler() {
 	return true;
 }
 
+function wp_ozh_cqr_add_page() {
+	$page = add_options_page('Absolute Comments Options', 'Absolute Comments', 'manage_options', 'absolute-comments', 'wp_ozh_cqr_adminpage');
+}
+
+function wp_ozh_cqr_adminpage() {
+	wp_ozh_cqr_include('_admin.php');
+	wp_ozh_cqr_adminpage_print();
+}
 
 function wp_ozh_cqr_savereply() {
 	wp_ozh_cqr_include('_save_comment.php');
@@ -159,8 +171,8 @@ function wp_ozh_cqr_include($inc) {
 
 // All set up, now tell WP what to do
 add_filter('comment_notification_text', 'wp_ozh_cqr_email', 10, 2);
-if (is_admin())
+if (is_admin()) {
 	add_action('admin_init', 'wp_ozh_cqr_take_over');
-
-	
+	add_action('admin_menu', 'wp_ozh_cqr_add_page');
+}
 ?>

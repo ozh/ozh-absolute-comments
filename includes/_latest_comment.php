@@ -6,12 +6,10 @@ Part of Plugin: Absolute Comments
 if (!defined('ABSPATH')) require_once('../../../../wp-config.php');
 if (!function_exists('wp_ozh_cqr_take_over') or !current_user_can('edit_posts')) die('You cannot do this');
 
-//require_once(ABSPATH.'/wp-admin/includes/admin.php');
 require_once(ABSPATH.'/wp-admin/admin.php');
 
 if ( get_option('show_avatars') )
 	add_filter( 'comment_author', 'floated_admin_avatar' );
-
 
 global $comments;
 

@@ -35,10 +35,12 @@ if ( strpos($_SERVER['REQUEST_URI'], 'edit-comments.php') !== false && !isset($_
 	$cqr_second_td = 3;
 }
 
-if ( strpos($_SERVER['REQUEST_URI'], 'edit-comments.php') !== false ) {
-	$cqr_allposts = "var _viewall = '<span class=\"quickreplylinks\"><a class=\"quickreplyall\" title=\"$cqr_viewalllink_title\" href=\"$cqr_blogurl/wp-admin/edit.php?p=' + post + '\">${imgall}$cqr_viewalllink</a></span>';" ;
+if ( strpos($_SERVER['REQUEST_URI'], 'edit-comments.php') !== false  && $wp_ozh_cqr['viewall']) {
+	$cqr_allposts = "var _viewall = '<span class=\"quickreplylinks\"><a class=\"quickreplyall\" id=\"quick_viewall_'+id+'_'+post+'\" title=\"$cqr_viewalllink_title\" href=\"$cqr_blogurl/wp-admin/edit.php?p=' + post + '\">${imgall}$cqr_viewalllink</a></span>';" ;
+	$cqr_doviewall = "var doviewall = true;";
 } else {
 	$cqr_allposts = 'var _viewall = "";';
+	$cqr_doviewall = "var doviewall = false;";
 }
 
 if (isset($_GET['quick_reply'])) {
@@ -91,6 +93,9 @@ echo <<<CSS
 	th.action-links, td.action-links {
 		text-align:left;
 	}
+	span.approve {
+		color:#fff;
+	}
 CSS;
 
 global $text_direction;
@@ -110,7 +115,7 @@ if ($wp_ozh_cqr['show_icon']) {
 		background:transparent url($cqr_blogurl/wp-content/plugins/$cqr_plugindir/images/reply.gif) 4px 0 no-repeat;
 		padding-left:25px;
 		}
- 		a.editlink {
+ 		a.quickreplyeditlink {
 		background:transparent url($cqr_blogurl/wp-content/plugins/$cqr_plugindir/images/edit.gif) 4px 0 no-repeat;
 		padding-left:25px;
 		}
@@ -178,6 +183,8 @@ echo <<<JS
 <script type="text/javascript">
 var cqr_footer = false;
 var cqr_is_open = [];
+var cqr_post_list = {};
+$cqr_doviewall
 	
 jQuery(document).ready(function() {
 	// Reverse comments if applicable
@@ -188,8 +195,10 @@ jQuery(document).ready(function() {
 	// add links and their ajaxy behaviors
 	cqr_add_links();
 	cqr_init_links();
-	// Add some love to the footer
+	// Add some love to the footer if applicable
 	cqr_add_footer();
+	// Make sure approve & unapprove links never turn black so you can't see the separator |
+	cqr_approve_links();
 })
 
 // Remove everything this script adds via javascript
@@ -208,21 +217,26 @@ function cqr_reset_links() {
 
 // Add quick reply links, with and without ajax, and the reply divs
 function cqr_add_links() {
-	//jQuery('#the-comment-list li[@id^=comment]').
-	jQuery('#the-comment-list tr').each(function() {
+	cqr_add_links_parsetable('#the-comment-list');
+	cqr_add_links_parsetable('#the-extra-comment-list');
+	if (doviewall) cqr_get_post_type();
+}
+
+// Parse the target table to add the stuff we need
+function cqr_add_links_parsetable(target) {
+	jQuery(target+' tr').each(function() {
 		var id = jQuery(this).attr('id');
 		if (id) {
 			cqr_footer = true;
 			id = id.replace('comment-', '');
 			var post = jQuery(this).find("td:last-child a[@href*=deletecomment]").attr('href').replace(/.*&?p=([^&]*).*/,function($0,$1){return $1;}); // post id
+			cqr_post_list[id] = post;
 			$cqr_reply
-			var _edit = '<span class=\"quickreplylinks"\><a class=\"editlink\" id=\"quick_reply_'+id+'_'+post+'\" title=\"$cqr_editlink_title\" href=\"${cqr_blogurl}/wp-admin/comment.php?action=editcomment&c=' + id + '\">$cqr_editlink</a></span>';
+			var _edit = '<span class="quickreplylinks"><a class="quickreplyeditlink" title="$cqr_editlink_title" href="${cqr_blogurl}/wp-admin/comment.php?action=editcomment&c=' + id + '">$cqr_editlink</a></span>';
 			$cqr_allposts
-			var _bgcolor = jQuery(this).css('background-color');
-			if (_bgcolor == 'transparent') _bgcolor = 'white';
 			jQuery(this).find('td:nth-child($cqr_second_td)')
 				.find('span:visible').each(function(i,n){
-					jQuery(this).css('color', _bgcolor );
+					cqr_approve_links_changecolor(this);
 					//jQuery(this).html( jQuery(this).html().replace(/ \| /,' ') ); // <- breaks the Ajax, makes page reload on "Approve" and such :/
 					if (i>=1) {
 						jQuery(this).before('<br class="quickreplybreak" />');
@@ -231,10 +245,62 @@ function cqr_add_links() {
 				.append(_reply)
 				.append(_edit)
 				.append(_viewall);
-			jQuery(this).find('td:nth-child($cqr_first_td)').append('<div class=\"quickreplydiv\" id=\"div_quick_reply_'+id+'\"></div>');
+			jQuery(this).find('td:nth-child($cqr_first_td)')
+				.append('<div class=\"quickreplydiv\" id=\"div_quick_reply_'+id+'\"></div>');
+
 		}
 	});
 }
+
+// On all .approve & .unapprove links, add some onclick behavior
+function cqr_approve_links() {
+	jQuery('td.action-links span').each(function(){
+		if (jQuery(this).is('.approve') || jQuery(this).is('.unapprove')) {
+			jQuery(this).find('a').click(function(){
+				cqr_approve_links_changecolor(jQuery(this).parent());
+			});
+		}
+		
+	});
+}
+
+// Change span color to match parent's background
+function cqr_approve_links_changecolor(span) {
+	var _bgcolor = jQuery(span).css('background-color');
+	if (_bgcolor == 'transparent') _bgcolor = 'white';
+	jQuery(span).css('color', _bgcolor );
+}
+
+// Ajax call to get post types
+function cqr_get_post_type() {
+	//alert(cqr_post_list);
+	jQuery.post(
+		'${cqr_blogurl}/wp-content/plugins/${cqr_plugindir}/includes/_get_post_type.php',
+		cqr_post_list,
+		function (xml) { cqr_change_viewall_links(xml); }
+	);
+}
+
+
+// Change on the fly "View all" links with correct link depending on post type
+function cqr_change_viewall_links(xml) {
+	var _link = {};
+	_link['attachment'] = 'upload.php?attachment_id=';
+	_link['page'] = 'edit-pages.php?page_id=';
+	// post: edit.php?p=
+	jQuery('comment',xml).each(function(){
+		var cid = jQuery('id',this).text();
+		var pid = jQuery('post',this).text();
+		var type = jQuery('type',this).text();
+		if (type != 'post') {
+			// change the url of #quick_viewall_cid_pid
+			var _href = jQuery('#quick_viewall_'+cid+'_'+pid).attr('href');
+			_href = _href.replace(/edit\.php\?p=/,_link[type]);
+			jQuery('#quick_viewall_'+cid+'_'+pid).attr('href',_href);
+		}
+	});
+}
+
 
 // Add Ajax functions to quick reply links
 function cqr_init_links() {
@@ -270,6 +336,9 @@ function cqr_init_links() {
 				'</p>'+
 				'</form></div>'				
 				);
+				jQuery('#cqr_textarea_'+id).keyup(function(e){
+					if (e.which == 27) cqr_cancelreply(id,post) // close on Escape
+				});
 				jQuery('#div_quick_reply_'+id).addClass('quickreplydivpop');
 				jQuery(this).html('$cqr_cancellink').addClass('quickreplycancel').removeClass('quickreplylink').attr('title','$cqr_cancellink');
 				jQuery('#cqr_textarea_'+id).focus();
@@ -336,7 +405,10 @@ function cqr_get_reply(xml, id) {
 		{},
 		function() {
 			jQuery('#the-comment-list').prepend(jQuery('#quickreplied').html());
-			jQuery('#comment-'+id).animate( { backgroundColor:"#CFEBF7" }, 800 ).animate( { backgroundColor:"transparent" }, 800 )
+			jQuery('#comment-'+id)
+				.animate( { backgroundColor:"#CFEBF7" }, 600 )
+				.animate( { backgroundColor:"#ff8" }, 300 )
+				.animate( { backgroundColor:"transparent" }, 300 );
 			cqr_reset_links();
 		}
 	);

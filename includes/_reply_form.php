@@ -2,7 +2,6 @@
 /*
 Part of Plugin: Absolute Comments
 */
-
 $comment = $wp_ozh_cqr['comment'];
 
 if (!function_exists('wp_ozh_cqr_take_over') or !$comment) die('You cannot do this...');
@@ -33,12 +32,12 @@ addLoadEvent(focusit);
 <?php 
 	$comment_status = wp_get_comment_status($comment->comment_ID);
 	if ($comment_status !== 'approved') $cqr_status = '('.wp_ozh_cqr__('currently flagged as'). " <span style='color:red'>$comment_status</span>)";
-	echo '<h3>'.wp_ozh_cqr__('Your reply to this comment')." <a href='#thiscomment'>&darr;</a> $cqr_status\n</h3>
+	echo '<h3>'.wp_ozh_cqr__('Your reply to this comment')." <a href='#thiscommentwrap'>&darr;</a> $cqr_status\n</h3>
 	<input type='hidden' name='cqr_simpleform' value='0'/>
 	";
 
 	// a little takeover of your options ?
-	if ($wp_ozh_cqr['editor_rows'] !== false && is_int($wp_ozh_cqr['editor_rows'])) {
+	if ($wp_ozh_cqr['editor_rows']) {
 		$old_rows = get_option('default_post_edit_rows');
 		update_option('default_post_edit_rows',$wp_ozh_cqr['editor_rows']);	
 	}
