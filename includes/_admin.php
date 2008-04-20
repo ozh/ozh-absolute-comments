@@ -19,6 +19,10 @@ function wp_ozh_cqr_processforms() {
 	
 	// Store
 	update_option('ozh_absolutecomments',$wp_ozh_cqr);
+	
+	echo '
+	<div class="updated fade" id="message"><p>Options <strong>saved</strong>.</p></div>
+	';
 }
 
 
