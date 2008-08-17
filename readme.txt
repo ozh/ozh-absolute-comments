@@ -1,5 +1,6 @@
 === Ozh' Absolute Comments ===
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
+Donate link: http://planetozh.com/exit/donate
 Requires at least: 2.5
 Stable tag: trunk
 
