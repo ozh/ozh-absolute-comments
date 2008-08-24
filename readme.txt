@@ -12,9 +12,7 @@ Instantly reply to comments from within "Manage Comments" or from email notifica
 
 **Absolute Comments** beautifully integrates within WordPress and does not add any extra page to manage comments. Everything is done via the original page.
 
-The comments is fully translated in the following languages: English, French, German, Dutch, Italian, Chinese Simplified, Roman, Finnish, Hebrew, Danish, and more. See "Translation Notes" for more info.
-
-For a more detailed documentation and screenshots of the interface, please visit its official page: [Absolute Comments](http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/ "Absolute Comments")
+For a more detailed documentation, list of available translations and screenshots of the interface, please visit its official page: [Absolute Comments](http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/ "Absolute Comments")
 
 **Tip:** To keep track of this plugin's evolution and features, you are advised to subscribe to the [author's feed](http://planetozh.com/exit/feed)
 
