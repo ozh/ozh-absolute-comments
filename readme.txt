@@ -1,7 +1,7 @@
 === Ozh' Absolute Comments ===
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
 Donate link: http://planetozh.com/exit/donate
-Requires at least: 2.5
+Requires at least: 2.8
 Stable tag: trunk
 
 Instantly reply to comments from within "Manage Comments" or from email notification, without visiting the post page.
@@ -9,8 +9,6 @@ Instantly reply to comments from within "Manage Comments" or from email notifica
 == Description ==
 
 **Absolute Comments** is a comment manager plugin that lets you instantly reply to comments, either from the original *Manage Comments* administration page, or from the email notification, without the hassle of visiting the post first.
-
-**Absolute Comments** beautifully integrates within WordPress and does not add any extra page to manage comments. Everything is done via the original page.
 
 For a more detailed documentation, list of available translations and screenshots of the interface, please visit its official page: [Absolute Comments](http://planetozh.com/blog/my-projects/absolute-comments-manager-instant-reply/ "Absolute Comments")
 
@@ -20,4 +18,4 @@ For a more detailed documentation, list of available translations and screenshot
 
 1. Unzip & upload the plugin directory inside your `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Head to your regular *Manage Comments* page
+1. Visit the Settings menu for the plugin options

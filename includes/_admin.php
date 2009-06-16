@@ -13,9 +13,7 @@ function wp_ozh_cqr_processforms() {
 	$wp_ozh_cqr['editor_rows'] = intval($_POST['ozh_ac_editor']);
 	$wp_ozh_cqr['show_icon'] = ($_POST['ozh_ac_icons'] == 'true' ? true : false );
 	$wp_ozh_cqr['prefill_reply'] = attribute_escape($_POST['ozh_ac_prefill']);	
-	$wp_ozh_cqr['show_threaded'] = ($_POST['ozh_ac_thread'] == 'true' ? true : false );	
 	$wp_ozh_cqr['mail_promote'] = ($_POST['ozh_ac_mail'] == 'true' ? true : false );	
-	$wp_ozh_cqr['viewall'] = ($_POST['ozh_ac_viewall'] == 'true' ? true : false );
 	
 	// Store
 	update_option('ozh_absolutecomments',$wp_ozh_cqr);
@@ -38,10 +36,8 @@ function wp_ozh_cqr_adminpage_print() {
 	$editor_rows = $wp_ozh_cqr['editor_rows'];
 	$icon = $wp_ozh_cqr['show_icon'];
 	$prefill = stripslashes($wp_ozh_cqr['prefill_reply']);
-	$thr = $wp_ozh_cqr['show_threaded'];
 	$mail = $wp_ozh_cqr['mail_promote'];
-	$viewall = $wp_ozh_cqr['viewall'];
-	foreach (array('icon', 'thr', 'mail', 'viewall') as $wtf) {
+	foreach (array('icon', 'mail') as $wtf) {
 		${"checked_${wtf}_on"} = ($$wtf ? ' checked="checked"' : '' );
 		${"checked_${wtf}_off"} = ($$wtf ? '' : ' checked="checked"' ) ;
 		// weeee, $$var ftw !
@@ -68,24 +64,13 @@ HTML;
 	<input name="ozh_ac_icons" id="ozh_ac_icons_off" value="false" $checked_icon_off type="radio"><label for="ozh_ac_icons_off">Disabled</label>
 	</td></tr>
 	
-	<tr><th scope="row">"View All" Links</th>
-	<td><input name="ozh_ac_viewall" id="ozh_ac_viewall_on" value="true" $checked_viewall_on type="radio"><label for="ozh_ac_viewall_on">Enabled</label><br/>
-	<input name="ozh_ac_viewall" id="ozh_ac_viewall_off" value="false" $checked_viewall_off type="radio"><label for="ozh_ac_viewall_off">Disabled</label>
-	</td></tr>
-	
 	<tr><th scope="row">Reply Prefill</th>
 	<td><textarea name="ozh_ac_prefill" id="ozh_ac_prefill" rows="2" cols="50">$prefill</textarea><br/>
 	Prefill your reply custom text containing the commenter's name and/or the comment permalink. Use tokens <code>%%name%%</code> and <code>%%link%%</code><br/>
 	Click on a preset:<ul id="ozh_ac_preset"><li>@Joe: </li><li>Joe &raquo; </li><li><a href="#comment-12345">#</a>Joe&rarr; </li><li>Dear <strong>Joe</strong>,</li></ul>
 	<div>Preview:<br/><span id="ozh_ac_replypreview"></span></div>
 	</td></tr>
-	
-	<tr><th scope="row">Threaded Comment Support</th>
-	<td><input name="ozh_ac_thread" id="ozh_ac_thread_on" value="true" $checked_thr_on type="radio"><label for="ozh_ac_thread_on">Enabled</label><br/>
-	<input name="ozh_ac_thread" id="ozh_ac_thread_off" value="false" $checked_thr_off type="radio"><label for="ozh_ac_thread_off">Disabled</label><br/>
-	<em>Note: this is not a feature in itself, you'll need a threading comments plugin/theme</em>
-	</td></tr>
-	
+		
 	<tr><th scope="row">Promote by Mail</th>
 	<td><input name="ozh_ac_mail" id="ozh_ac_mail_on" value="true" $checked_mail_on type="radio"><label for="ozh_ac_mail_on">Enabled</label><br/>
 	<input name="ozh_ac_mail" id="ozh_ac_mail_off" value="false" $checked_mail_off type="radio"><label for="ozh_ac_mail_off">Disabled</label><br/>
@@ -93,7 +78,7 @@ HTML;
 	</td></tr>
 	</tbody></table>
 	
-	<p class="submit"><input type="submit" value="Update Options &raquo;" /></p>
+	<p class="submit"><input type="submit" class="button-primary" value="Update Options &raquo;" /></p>
 
 	</form>
 	</div>
@@ -134,7 +119,6 @@ function wp_ozh_cqr_adminpage_js() {
 	echo <<<JS
 	<script type="text/javascript">
 	jQuery(document).ready( function() {
-		jQuery('.ozh_ac_help').tTips();
 		jQuery('#ozh_ac_prefill').keyup(function(){
 			jQuery('#ozh_ac_replypreview').html(ozh_ac_detokenize(jQuery(this).val()));
 		});

@@ -3,40 +3,49 @@
 Part of Plugin: Absolute Comments
 */
 
+global $wp_ozh_cqr;
 $comment = $wp_ozh_cqr['comment'];
+$comment_id = $comment->comment_ID;
+$comment_post_id = $comment->comment_post_ID;
+
+//var_dump($comment);
 
 if (!function_exists('wp_ozh_cqr_take_over')) die('You cannot do this.');
 
-echo <<<HTML
-<style>
-#the-comment-list thead, #the-comment-list th  {
-	background-color:#CFEBF7;
-	color:black;
-	font-size:14px;
-}
-#the-comment-list, #the-comment-list td, #the-comment-list th {
-	border-color:white;
-}
-#thiscommentwrap {
-	margin:20px 8px 0 20px;
-	border:1px solid #EBEBEB;
-	border-color:#EBEBEB rgb(204, 204, 204) rgb(204, 204, 204) rgb(235, 235, 235);
-	padding:2px;
-}
-</style>
-<div id="thiscommentwrap" class="postarea">
-<table id="the-comment-list" class="widefat list:comment">
+?>
+<table class="widefat comments fixed" cellspacing="0">
 <thead>
-  <tr>
-    <th scope="col">Comment</th>
-	<th scope="col">Date</th>
-    <th scope="col">Actions</th>
-  </tr>
+	<tr>
+<?php print_column_headers('edit-comments'); ?>
+	</tr>
 </thead>
+
+<tbody id="the-comment-list" class="list:comment">
+<?php
+		_wp_comment_row( $comment_id, 'detail', '', true);
+?>
+</tbody>
+</table>
+<div id="ajax-response"></div>
+<?php
+wp_comment_reply('-1', true, 'detail');
+
+
+
+echo <<<HTML
+	<style type="text/css">
+		th.check-column input {display:none}
+		div.row-actions {visibility:visible}
+	</style>
+	<script type="text/javascript">
+	jQuery(document).ready(function() {
+		// Slightly delay to allow the other document.ready to fire first
+		jQuery('div.row-actions span.reply a').animate({'opacity':'1'}, 100, function(){
+			jQuery(this).click();
+		});
+	});
+	</script>
 HTML;
 
-_wp_comment_row($comment->comment_ID, 'detail', '', false);
-
-echo "</table></div>";
 
 ?>
