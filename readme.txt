@@ -2,6 +2,7 @@
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
 Donate link: http://planetozh.com/exit/donate
 Requires at least: 2.8
+Tested up to: 9.9
 Stable tag: trunk
 
 Instantly reply to comments from within "Manage Comments" or from email notification, without visiting the post page.
