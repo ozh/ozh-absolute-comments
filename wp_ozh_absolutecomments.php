@@ -5,7 +5,7 @@ Plugin URI: http://planetozh.com/blog/my-projects/absolute-comments-manager-inst
 Description: Reply instantly to comments, either from the email notification, or the usual <a href="edit-comments.php">Comments</a> page, without loading the post first. <strong>For WordPress 2.8+</strong>
 Author: Ozh
 Author URI: http://planetozh.com/
-Version: 3.0.1
+Version: 3.0.2
 */
 
 /* Release history:
@@ -22,6 +22,7 @@ Version: 3.0.1
    2.2.2.1: More translations
    3.0: Update for WP 2.8
    3.0.1: Oops, forgot a file :P
+   3.0.2: Fixed: (un)approve comments was borked
  */
 
 /********* Do not edit anything. *********/
@@ -32,7 +33,7 @@ global $wp_ozh_cqr;
 
 // Include one of our files
 function wp_ozh_cqr_include($inc) {
-	include(WP_PLUGIN_DIR.'/'.dirname(plugin_basename(__FILE__)).'/includes/'.basename($inc));
+	include_once(WP_PLUGIN_DIR.'/'.dirname(plugin_basename(__FILE__)).'/includes/'.basename($inc));
 }
 
 // Add the convenient Reply link to mail notifications
