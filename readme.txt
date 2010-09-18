@@ -3,6 +3,7 @@ Donate link: http://planetozh.com/exit/donate
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
 Requires at least: 2.0.11 (might work with, but untested below 2.2.3)
 Tested up to: 2.3.3
+Contributors: ozh
 
 Instantly reply to comments from within "Manage Comments" or from email notification, without visiting the post page.
 
