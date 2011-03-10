@@ -2,6 +2,7 @@
 Tags: comment, comments, spam, reply, replies, ozh, comment manager, mail, email
 Donate link: http://planetozh.com/exit/donate
 Requires at least: 3.1
+Tested up to: 9.9
 Stable tag: trunk
 
 Reply to comments from email notification
